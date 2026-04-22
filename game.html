@@ -1,0 +1,320 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Zane Stapelman - Mini Wordle</title>
+<link rel="icon" type="image/x-icon" href="assets/favicon.ico" />
+<style>
+.header,
+.navbar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 999;                 /* keeps them above all content */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);  /* subtle floating shadow */
+}
+
+/* Header sits at the very top */
+.header {
+  top: 0;
+  height: 40px;
+  line-height: px;
+}
+
+/* Navbar sits directly under the header */
+.navbar {
+  top: 80px;                    /* exactly the height of the header */
+  padding: 10px;
+}
+nav a{
+    color: black;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
+    float: center;
+}
+nav a:hover{
+    background-color: #0047ba;
+    color: white;
+}
+
+.header{
+background-color: #0047ba;
+color: white;
+height: 80px;
+line-height: 50px
+}
+
+.navbar{
+background-color: white;
+color: black;
+padding: 10px;
+text-align: center;
+overflow: hidden;
+}
+
+  body {
+    font-family: Arial, sans-serif;
+    text-align: center;
+    background: lightgray;
+    color: #0047ba;
+  }
+
+  h1 {
+    margin-top: 20px;
+  }
+
+  .grid {
+    display: grid;
+    grid-template-rows: repeat(6, 60px);
+    gap: 5px;
+    justify-content: center;
+    margin-top: 20px;
+  }
+
+  .row {
+    display: grid;
+    grid-template-columns: repeat(5, 60px);
+    gap: 5px;
+  }
+
+  .tile {
+    border: 2px solid #3a3a3c;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 24px;
+    text-transform: uppercase;
+  }
+
+  .correct {
+    color: white;
+    background-color: #538d4e;
+    border: none;
+  }
+
+  .present {
+    color: white;
+    background-color: #b59f3b;
+    border: none;
+  }
+
+  .absent {
+    color: white;
+    background-color: #3a3a3c;
+    border: none;
+  }
+
+  #message {
+    margin-top: 20px;
+    font-size: 20px;
+  }
+
+  .instruct-block{
+ color: white;
+ background-color: #0047ba;
+ max-width: 300px;
+ margin: 0 auto;
+ padding: 5px 20px;
+ text-align: center;   
+}
+</style>
+</head>
+<body>
+
+    <div class="sports header">
+        <h1>Mini Wordle</h1>
+    </div>
+    <nav class="sports navbar">
+        <a href="index.html">Home</a>
+        <a href="resume.html">Resume</a>
+        <a href="sports.html">Sports</a>
+        <a href="game.html">Wordle</a>
+    </nav>
+    <br id="top"><br><br><br><br>
+    <br><br>
+
+<h2>Today's Game</h2>
+<div class="grid" id="grid"></div>
+<div id="message"></div>
+<button id="restartBtn">Restart</button>
+<br><br>
+<div class="instruct-block">
+    <p>If the hitting "Enter" makes the grid wipe itself clean, 
+    wait for a few seconds for the dictionary to load and then click on the first square in the grid to reset the game.</p>
+</div>
+
+<script>
+const WORDS = ["apple", "grape", "chair", "table", "plant"];
+let ANSWER;
+
+let gameActive = false;        // starts false until dictionary loads
+let dictionaryLoaded = false;  // NEW FLAG
+let currentRow = 0;
+let currentGuess = "";
+
+let VALID_WORDS = [];
+
+const grid = document.getElementById("grid");
+const message = document.getElementById("message");
+const restartBtn = document.getElementById("restartBtn");
+
+// Load dictionary FIRST — do NOT start game yet
+fetch("assets/words.json")
+  .then(res => res.json())
+  .then(data => {
+    VALID_WORDS = data;
+    dictionaryLoaded = true;
+    console.log("Dictionary loaded:", VALID_WORDS.length, "words");
+
+    initGame();   // Start game ONLY after dictionary loads
+  })
+  .catch(err => console.error("Error loading dictionary:", err));
+
+
+// Initialize game safely
+function initGame() {
+  if (!dictionaryLoaded) {
+    message.textContent = "Dictionary still loading...";
+    return;
+  }
+
+  gameActive = false;
+
+  grid.innerHTML = "";
+  message.textContent = "";
+
+  currentRow = 0;
+  currentGuess = "";
+
+  ANSWER = VALID_WORDS[Math.floor(Math.random() * VALID_WORDS.length)];
+
+  // Build grid
+  for (let i = 0; i < 6; i++) {
+    const row = document.createElement("div");
+    row.classList.add("row");
+
+    for (let j = 0; j < 5; j++) {
+      const tile = document.createElement("div");
+      tile.classList.add("tile");
+      row.appendChild(tile);
+    }
+
+    grid.appendChild(row);
+  }
+  gameActive = true;
+}
+
+function getRows() {
+  return document.querySelectorAll(".row");
+}
+
+
+// Key handling — now dictionary‑safe
+document.addEventListener("keydown", (e) => {
+  if (!gameActive) return;
+
+  if (e.key === "Backspace") {
+    currentGuess = currentGuess.slice(0, -1);
+    updateTiles();
+  }
+
+  else if (e.key === "Enter") {
+    if (!dictionaryLoaded) {
+      message.textContent = "Dictionary still loading...";
+      return;
+    }
+    if (currentGuess.length === 5) {
+      checkGuess();
+    }
+  }
+
+  else if (/^[a-zA-Z]$/.test(e.key)) {
+    if (currentGuess.length < 5) {
+      currentGuess += e.key.toLowerCase();
+      message.textContent = ""; // clear warnings
+      updateTiles();
+    }
+  }
+});
+
+
+function updateTiles() {
+  const row = getRows()[currentRow];
+  if (!row) return;
+
+  const tiles = row.children;
+  for (let i = 0; i < 5; i++) {
+    tiles[i].textContent = currentGuess[i] || "";
+  }
+}
+
+
+// Check guess — now dictionary‑safe
+function checkGuess() {
+  if (!dictionaryLoaded) {
+    message.textContent = "Dictionary still loading...";
+    return;
+  }
+
+  if (!VALID_WORDS.includes(currentGuess)) {
+    message.textContent = "Not a valid word";
+    return;
+  }
+
+  const row = getRows()[currentRow];
+  if (!row) return;
+
+  const tiles = row.children;
+  let answerArray = ANSWER.split("");
+  let guessArray = currentGuess.split("");
+
+  // Correct letters
+  for (let i = 0; i < 5; i++) {
+    if (guessArray[i] === answerArray[i]) {
+      tiles[i].classList.add("correct");
+      answerArray[i] = null;
+      guessArray[i] = null;
+    }
+  }
+
+  // Present / absent letters
+  for (let i = 0; i < 5; i++) {
+    if (guessArray[i]) {
+      const index = answerArray.indexOf(guessArray[i]);
+      if (index !== -1) {
+        tiles[i].classList.add("present");
+        answerArray[index] = null;
+      } else {
+        tiles[i].classList.add("absent");
+      }
+    }
+  }
+
+  if (currentGuess === ANSWER) {
+    message.textContent = "You win!";
+    gameActive = false;
+    return;
+  }
+
+  currentRow++;
+  currentGuess = "";
+
+  if (currentRow === 6) {
+    message.textContent = "Game over! Word was: " + ANSWER;
+    gameActive = false;
+  }
+}
+
+
+// Restart button — now dictionary‑safe
+restartBtn.onclick = () => {
+  if (!dictionaryLoaded) {
+    message.textContent = "Dictionary still loading...";
+    return;
+  }
+  initGame();
+};
+</script>

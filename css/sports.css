@@ -1,0 +1,239 @@
+/* Fixed header + navbar */
+.header,
+.navbar {
+  position: fixed;
+  left: 0;
+  width: 100%;
+  z-index: 999;                 /* keeps them above all content */
+  box-shadow: 0 2px 6px rgba(0,0,0,0.2);  /* subtle floating shadow */
+}
+
+/* Header sits at the very top */
+.header {
+  top: 0;
+  height: 40px;
+  line-height: px;
+}
+
+/* Navbar sits directly under the header */
+.navbar {
+  top: 80px;                    /* exactly the height of the header */
+  padding: 10px;
+}
+
+/* Push the rest of the page down so content isn't hidden */
+body {
+  padding-top: 200px;           /* header (50px) + navbar (~60px) */
+}
+
+.header{
+background-color: #0047ba;
+color: white;
+height: 80px;
+line-height: 50px
+}
+
+.navbar{
+background-color: white;
+color: black;
+padding: 10px;
+text-align: center;
+overflow: hidden;
+}
+
+.content{
+font-family: Arial, Helvetica, sans-serif;
+}
+
+h2{
+    text-align: center;
+}
+
+.sports{
+    text-align: center;
+    font-family:Arial, Helvetica, sans-serif;
+
+}
+
+nav a{
+    color: black;
+    padding: 10px 20px;
+    text-decoration: none;
+    font-size: 16px;
+    font-weight: bold;
+    display: inline-block;
+    float: center;
+}
+nav a:hover{
+    background-color: #0047ba;
+    color: white;
+}
+
+
+p{
+    text-align: center;
+    font-weight: bold;
+    font-size: 16px;
+}
+#topofpage{
+    text-decoration: underline;
+}
+.textemphasize{
+    font-style: italic;
+    color: blue;
+}
+body{
+    background-color: lightgray;
+    font-family: Arial, Helvetica, sans-serif;
+    color: black;
+    border: 5px solid black;
+    margin: 20px;
+    padding: 20px;
+}
+
+/* Two-column layout */
+.two-column {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px;
+  gap: 30px;
+
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+/* Text block */
+.text-block {
+  flex: 1;
+  min-width: 300px;
+  text-align: left;
+}
+
+/* Image block */
+.image-block {
+  flex: 1;
+  min-width: 300px;
+  text-align: left;
+}
+
+.image-block img {
+  width: 90%;
+  border-radius: 10px;
+}
+
+.text-block ol,
+.text-block ul {
+  text-align: left;        
+  margin-left: auto; 
+  margin-right: auto;         
+  width: fit-content;      
+}
+
+.text-block ol {
+  list-style-position: outside;
+  padding-left: 20px;   
+}
+
+.text-block ol > li {
+  margin-bottom: 20px;  
+}
+
+.text-block ul {
+  list-style-position: outside;
+  padding-left: 20px;
+}
+
+@media (max-width: 800px) {
+  .two-column {
+    flex-direction: column;  
+    text-align: center;       
+  }
+
+  .image-block img {
+    width: 100%;           
+  }
+
+  .text-block {
+    width: 100%;
+  }
+}
+
+.text-block,
+.image-block {
+  flex: 1 1 50%; 
+}
+
+.intro-block{
+ max-width: 900px;
+ margin: 0 auto;
+ padding: 40px 20px;
+ text-align: center;   
+}
+
+@media (max-width: 800px) {
+    .intro-block {
+        padding: 20px;
+    }
+}
+
+.full-width {
+  padding: 40px;
+  text-align: center;
+  max-width: 1000px;
+  margin: 0 auto;
+}
+
+.video-container {
+  position: relative;
+  width: 100%;
+  max-width: 800px;   /* keeps it centered and not too wide */
+  margin: 0 auto;
+  padding-bottom: 56.25%; /* 16:9 aspect ratio */
+  height: 0;
+  overflow: hidden;
+}
+
+.video-container iframe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  border: 0;
+  display: block;
+}
+
+.toplink {
+  text-align: center;
+  margin-top: 40px;
+  color:#0047ba;
+  text-decoration: none;
+}
+
+.toplink:visited {
+  color: #0047ba;
+}
+.toplink a {
+  position: relative;
+}
+
+.toplink a::after {
+  content: "";
+  position: absolute;
+  left: 50%;
+  bottom: -3px;
+  width: 0;
+  height: 2px;
+  background: #0047ba;
+  transition: 0.3s ease;
+  transform: translateX(-50%);
+}
+
+.toplink a:hover::after {
+  width: 100%;
+}
+
+html{
+    scroll-behavior: smooth;
+}
